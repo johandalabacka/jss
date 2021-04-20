@@ -1,8 +1,11 @@
-async function getCurrentUser() {
+export async function getCurrentUser() {
     const stat = await Deno.lstat("/dev/console")
+    if (! stat?.uid) {
+      return null
+    }
     const p = Deno.run({
       // -P as a passwd entry
-      cmd: ['id', '-P', stat.uid],
+      cmd: ['id', '-P', stat.uid.toString()],
       stdout: "piped"
     })
     const status = await p.status()
