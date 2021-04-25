@@ -1,4 +1,5 @@
 
+import { getCurrentUser } from './user.ts'
 
 interface RunOptions {
   stdout?: number | "null" | "inherit" | "piped" | undefined
@@ -45,9 +46,26 @@ export async function run(cmd : string[],
   return { status, stdout, stderr }
 }
 
-/* export async function runScriptAsCurrentUser() : Promise<{status: Deno.ProcessStatus, stdout: string, stderr: string}> {
-  Deno.args
-} */
+export async function runScriptAsCurrentUser() : Promise<{status: Deno.ProcessStatus, stdout: string, stderr: string}> {
+  const username = await getCurrentUser()
+  if (!username) {
+    return {
+      status: {
+        success: false,
+        code: -1
+      },
+      stdout: '',
+      stderr: 'Current user not found'
+    }
+  }
+  // const scriptPath = getCurrentScript()
+  const tempScriptPath = await Deno.makeTempFile({suffix: '.ts'})
+  await Deno.copyFile(Deno.mainModule, tempScriptPath)
+  const cmd = ['/usr/bin/sudo', '-u', username, tempScriptPath, ...Deno.args]
+  const result = await run(cmd)
+  await Deno.remove(tempScriptPath)
+  return result
+}
 
 export function getCurrentScript() : string {
   const url = new URL(Deno.mainModule)
