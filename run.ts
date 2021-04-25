@@ -46,6 +46,23 @@ export async function run(cmd : string[],
   return { status, stdout, stderr }
 }
 
+export function escapeShellArgs(args : string[]) : string {
+  return args.map( (arg : string) => {
+    arg = arg.replaceAll(/([\$])/g, (s : string) => `\\${s}`)
+    arg = arg.replaceAll(`'`, `'\\''`)
+    if (arg.includes(' ') || arg.includes('\'')) {
+      return `'${arg}'`
+    }
+    return arg
+  }).join(' ')
+}
+
+export function runInShell(cmd : string[], options : RunOptions = {stdout: 'piped', stderr: 'piped'}
+) : Promise<{status: Deno.ProcessStatus, stdout: string, stderr: string}> {
+  const cmdShell = ['/bin/sh', '-c', escapeShellArgs(cmd)]
+  return run(cmdShell, options)
+}
+
 export async function runScriptAsCurrentUser() : Promise<{status: Deno.ProcessStatus, stdout: string, stderr: string}> {
   if (Deno.env.get('USER') !== 'root') {
     return {
