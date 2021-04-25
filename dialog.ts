@@ -5,9 +5,22 @@ interface DialogOptions {
   iconPath? : string,
   runInBackground? : boolean
 }
-
-export function showDialog(title : string, description : string,
+/**
+ * Show a jamf dialog
+ * 
+ * @param title - title of dialog
+ * @param description - text in dialog
+ * @param options.buttons - button labels at most 2
+ * @param options.iconPath - path to icns-file to show
+ * @param options.runInBackground - run the dialog in background
+ * 
+ * @returns true if button 1 is pressed (or run in background). Return false if button 2 is pressed
+ */
+export async function showDialog(title : string, description : string,
   {buttons, iconPath, runInBackground} : DialogOptions = {buttons: ['OK'], iconPath: '', runInBackground: false}) {
+    if (buttons?.length === 2 && runInBackground) {
+      console.warn('running in background and two buttons is not usuable')
+    }
     let cmd = [
       '/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper',
       '-windowType', 'utility',
@@ -31,7 +44,10 @@ export function showDialog(title : string, description : string,
 
     if (runInBackground) {
       cmd.push('&') // To run in background
+      await runInShell(cmd, {stderr: undefined})
+      return true
     }
 
-    return runInShell(cmd, {stdout: undefined})
+    const {status} = await runInShell(cmd, {stderr: undefined})
+    return status.success 
 }
