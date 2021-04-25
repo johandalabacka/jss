@@ -51,7 +51,7 @@ export async function run(cmd : string[],
 
 export function getCurrentScript() : string {
   const url = new URL(Deno.mainModule)
-  return url.pathname
+  return decodeURI(url.pathname)
 }
 
 
