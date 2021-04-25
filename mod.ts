@@ -1,2 +1,5 @@
 export { getCurrentUser, getCurrentLocale } from "./user.ts";
-export { run, getCurrentScript } from "./run.ts";
+export {
+  run,
+  runScriptAsCurrentUser,
+  getCurrentScript } from "./run.ts";
