@@ -6,3 +6,5 @@ export {
 } from "./run.ts";
 
 export { addLine } from './file.ts'
+
+export { showDialog } from './dialog.ts'
