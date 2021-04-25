@@ -16,7 +16,7 @@ interface RunOptions2 extends RunOptions {
  * @returns {}
  */
 export async function run(cmd : string[],
-  options : RunOptions = {stdout: 'piped', stderr: 'piped'}
+  options : RunOptions = {}
   ) : Promise<{status: Deno.ProcessStatus, stdout: string, stderr: string}> {
 
   const runOptions : RunOptions2 = {
@@ -24,22 +24,27 @@ export async function run(cmd : string[],
     stdout: undefined,
     stderr: undefined
   }
-  if (options.stdout) {
+  // deno-lint-ignore no-prototype-builtins
+  if (options.hasOwnProperty('stdout')) {
     runOptions.stdout = options.stdout
+  } else {
+    runOptions.stdout = "piped"
   }
-  if (options.stderr) {
+  // deno-lint-ignore no-prototype-builtins
+  if (options.hasOwnProperty('stderr')) {
     runOptions.stderr = options.stdout
+  } else {
+    runOptions.stderr = "piped"
   }
-
   const p = Deno.run(runOptions)
   const status = await p.status()
   const t = new TextDecoder()
   let stdout = ''
   let stderr = ''
-  if (options.stdout == "piped") {
+  if (runOptions.stdout == "piped") {
     stdout = t.decode(await p.output())
   }
-  if (options.stderr == "piped") {
+  if (runOptions.stderr == "piped") {
     stderr = t.decode(await p.stderrOutput())
   }
   p.close()
@@ -57,7 +62,7 @@ export function escapeShellArgs(args : string[]) : string {
   }).join(' ')
 }
 
-export function runInShell(cmd : string[], options : RunOptions = {stdout: 'piped', stderr: 'piped'}
+export function runInShell(cmd : string[], options : RunOptions = {}
 ) : Promise<{status: Deno.ProcessStatus, stdout: string, stderr: string}> {
   const cmdShell = ['/bin/sh', '-c', escapeShellArgs(cmd)]
   return run(cmdShell, options)
