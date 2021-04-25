@@ -4,9 +4,9 @@ import { showDialog } from './dialog.ts'
 Deno.test({
   name: "dialog",
   fn: async () => {
-    const iconPath = '/Applications/Unison LU.app/Contents/Resources/Unison.icns'
-    const result = await showDialog('Test', 'Some test text', iconPath)
-    console.log(result)
+    const iconPath = '/Applications/Utilities/Unison LU.app/Contents/Resources/Unison.icns'
+    const result = await showDialog('Test', 'Some test text', ['OK'], iconPath)
+    console.log({result})
     assertEquals("world", "world");
   },
 });

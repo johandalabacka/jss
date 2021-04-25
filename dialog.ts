@@ -1,20 +1,35 @@
 import { runInShell } from './run.ts'
 
-export function showDialog(title : string, description : string, iconPath : string = '') {
-    const cmd = [
+interface DialogOptions {
+  buttons : string[],
+  iconPath : string,
+  runInBackground : boolean
+}
+
+export function showDialog(title : string, description : string,
+  options : DialogOptions = {buttons: ['OK'], iconPath: '', runInBackground: false}) {
+    let cmd = [
       '/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper',
       '-windowType', 'utility',
-      '-button1', 'OK', '-defaultButton', '1',
       '-title', title,
       '-description', description
     ]
-    if (iconPath) {
-      cmd.push('-icon')
-      cmd.push(iconPath)
-      cmd.push('-iconSize')
-      cmd.push('64')
+    if (options.buttons.length === 0) {
+      cmd = cmd.concat(['-button1', 'OK', '-defaultButton', '1'])
+    } else if (options.buttons.length >= 1) {
+      cmd = cmd.concat(['-button1', options.buttons[0], '-defaultButton', '1'])
     }
-    cmd.push('&') // To run in background
+    if (options.buttons.length >= 2) {
+      cmd = cmd.concat(['-button2', options.buttons[1]])
+    }
+    
+    if (options.iconPath) {
+      cmd = cmd.concat('-icon', options.iconPath, '-iconSize', '64')
+    }
+
+    if (options.runInBackground) {
+      cmd.push('&') // To run in background
+    }
 
     return runInShell(cmd, {stderr: undefined})
 }
