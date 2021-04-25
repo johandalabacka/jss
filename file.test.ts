@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.93.0/testing/asserts.ts";
+import { assert, assertEquals } from "https://deno.land/std@0.93.0/testing/asserts.ts";
 import { addLine } from './file.ts'
 
 Deno.test({
@@ -6,10 +6,11 @@ Deno.test({
   fn: async()  => {
     const tmpFile = Deno.makeTempFileSync()
     Deno.writeTextFileSync(tmpFile, 'apa\nbanan\ncello\n')
-    await addLine(tmpFile, 'deno')
+    const wasAdded = await addLine(tmpFile, 'deno')
     const content = Deno.readTextFileSync(tmpFile)
     Deno.removeSync(tmpFile)
 
+    assert(wasAdded, 'line was not added')
     assertEquals(content, 'apa\nbanan\ncello\ndeno\n')
   },
 })
@@ -19,10 +20,11 @@ Deno.test({
   fn: async()  => {
     const tmpFile = Deno.makeTempFileSync()
     Deno.writeTextFileSync(tmpFile, 'apa\nbanan\ncello')
-    await addLine(tmpFile, 'deno')
+    const wasAdded = await addLine(tmpFile, 'deno')
     const content = Deno.readTextFileSync(tmpFile)
     Deno.removeSync(tmpFile)
 
+    assert(wasAdded, 'line was not added')
     assertEquals(content, 'apa\nbanan\ncello\ndeno\n')
   },
 })
@@ -32,10 +34,10 @@ Deno.test({
   fn: async()  => {
     const tmpFile = Deno.makeTempFileSync()
     Deno.writeTextFileSync(tmpFile, 'apa\nbanan\ncello\ndeno\n')
-    await addLine(tmpFile, 'deno')
+    const wasAdded = await addLine(tmpFile, 'deno')
     const content = Deno.readTextFileSync(tmpFile)
     Deno.removeSync(tmpFile)
-
+    assert(!wasAdded, 'line was added')
     assertEquals(content, 'apa\nbanan\ncello\ndeno\n')
   },
 })
@@ -44,10 +46,11 @@ Deno.test({
   name: "Add line (empty file)",
   fn: async()  => {
     const tmpFile = Deno.makeTempFileSync()
-    await addLine(tmpFile, 'deno')
+    const wasAdded = await addLine(tmpFile, 'deno')
     const content = Deno.readTextFileSync(tmpFile)
     Deno.removeSync(tmpFile)
 
+    assert(wasAdded, 'line was not added')
     assertEquals(content, 'deno\n')
   },
 })
