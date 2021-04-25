@@ -47,6 +47,16 @@ export async function run(cmd : string[],
 }
 
 export async function runScriptAsCurrentUser() : Promise<{status: Deno.ProcessStatus, stdout: string, stderr: string}> {
+  if (Deno.env.get('USER') !== 'root') {
+    return {
+      status: {
+        success: false,
+        code: -1
+      },
+      stdout: '',
+      stderr: 'Must be root to run script as current user'
+    }
+  }
   const username = await getCurrentUser()
   if (!username) {
     return {
