@@ -58,9 +58,9 @@ export async function runScriptAsCurrentUser() : Promise<{status: Deno.ProcessSt
       stderr: 'Current user not found'
     }
   }
-  // const scriptPath = getCurrentScript()
+  const scriptPath = getCurrentScript()
   const tempScriptPath = await Deno.makeTempFile({suffix: '.ts'})
-  await Deno.copyFile(Deno.mainModule, tempScriptPath)
+  await Deno.copyFile(scriptPath, tempScriptPath)
   const cmd = ['/usr/bin/sudo', '-u', username, tempScriptPath, ...Deno.args]
   const result = await run(cmd)
   await Deno.remove(tempScriptPath)
