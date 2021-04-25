@@ -4,7 +4,9 @@ import { getCurrentUser, getCurrentLocale } from './user.ts'
 Deno.test({
   name: "Get current user",
   fn: async()  => {
-    assertEquals(await getCurrentUser(), Deno.env.get('USER'))
+    const user = await getCurrentUser()
+    assertEquals(user.username, Deno.env.get('USER'))
+    assertEquals(user.home, Deno.env.get('HOME'))
   },
 })
 

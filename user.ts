@@ -15,8 +15,9 @@ export async function getCurrentUser() {
       return null
     }
     // Get first field (username)
-    const [username] = stdout.split(':')
-    return username
+    // ling-jda:********:904518429:1412170593::0:0:Johan Dahl:/Users/ling-jda:/bin/zsh
+    const [username,,uid,gid,,,,name,home,shell] = stdout.split(':')
+    return {username, uid, gid, name, home, shell}
 }
 
 /**

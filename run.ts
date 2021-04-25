@@ -24,12 +24,14 @@ export async function run(cmd : string[],
     stdout: undefined,
     stderr: undefined
   }
+  // Check if options has a property stdout (can be undefined)
   // deno-lint-ignore no-prototype-builtins
   if (options.hasOwnProperty('stdout')) {
     runOptions.stdout = options.stdout
   } else {
     runOptions.stdout = "piped"
   }
+  // Check if options has a property stderr (can be undefined)
   // deno-lint-ignore no-prototype-builtins
   if (options.hasOwnProperty('stderr')) {
     runOptions.stderr = options.stdout
@@ -79,8 +81,8 @@ export async function runScriptAsCurrentUser() : Promise<{status: Deno.ProcessSt
       stderr: 'Must be root to run script as current user'
     }
   }
-  const username = await getCurrentUser()
-  if (!username) {
+  const user = await getCurrentUser()
+  if (!user) {
     return {
       status: {
         success: false,
@@ -94,7 +96,7 @@ export async function runScriptAsCurrentUser() : Promise<{status: Deno.ProcessSt
   const tempScriptPath = await Deno.makeTempFile({suffix: '.ts'})
   await Deno.copyFile(scriptPath, tempScriptPath)
   await Deno.chmod(tempScriptPath, 0o755)
-  const cmd = ['/usr/bin/sudo', '-u', username, tempScriptPath, ...Deno.args]
+  const cmd = ['/usr/bin/sudo', '-u', user.username, tempScriptPath, ...Deno.args]
   const result = await run(cmd)
   await Deno.remove(tempScriptPath)
   return result
