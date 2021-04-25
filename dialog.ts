@@ -1,4 +1,4 @@
-import { run } from './run.ts'
+import { runInShell } from './run.ts'
 
 export function showDialog(title : string, description : string, iconPath : string = '') {
     const cmd = [
@@ -14,6 +14,7 @@ export function showDialog(title : string, description : string, iconPath : stri
       cmd.push('-iconSize')
       cmd.push('64')
     }
+    cmd.push('&') // To run in background
 
-    return run(cmd, {stderr: undefined})
+    return runInShell(cmd, {stderr: undefined})
 }
